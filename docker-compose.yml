@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: signalr-connection
+    image: redis:latest
+    command: redis-server
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      lab-network:
+        ipv4_address: 172.20.0.2
+
+  signalr-hub:
+    image: ${DOCKER_REGISTRY-}signalr-hub
+    depends_on:
+      - redis
+    build:
+      context: .
+      dockerfile: signalr-hub/Dockerfile
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      - "RedisSettings:Host=172.20.0.1"
+      - "RedisSettings:Port=6379"
+    networks:
+      lab-network:
+        ipv4_address: 172.20.0.4
+  
+networks:
+  lab-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1

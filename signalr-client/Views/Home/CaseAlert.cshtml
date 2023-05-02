@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Caso de Alerta";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to view alert cases.</p>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="toolbar" class="row g-3" title="Selecione um grupo de caso de alerta.">
+                <div class="col-10">
+                    @Html.Label("Grupo de alerta")
+                    @Html.DropDownList("group-alert", new SelectList("", "Value", "Text"), new { @class = "form-control", @placeholder = "Selecione um grupo de alerta" })
+                </div>
+                <div class="col-1" style="margin-top: 38px">
+                    <button type="button" id="btn-alert" class="btn btn-danger">Buscar</button>
+                </div>
+            </div>
+            <table id="table-case-alert"></table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js" asp-append-version="true"></script>
+    <script src="~/js/connection-hub-signalr.js" asp-append-version="true"></script>
+    <script src="~/js/case-alert.js" asp-append-version="true"></script>
+}

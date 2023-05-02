@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "UTlKOefeTW7CiQq11J4Tk9Q1qWjOqcfi7niiTF8yZSk=",
+  "Source": "signalr-hub",
+  "BasePath": "_content/signalr-hub",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
