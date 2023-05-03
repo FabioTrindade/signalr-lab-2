@@ -7,10 +7,10 @@ namespace signalr_hub.Services
     {
         Task Create(CreateCaseAlertCommand command);
 
-        void Update(UpdateCaseAlertCommand command);
+        Task<GenericCommandResult> Update(UpdateCaseAlertCommand command);
 
-        GenericCommandResult GetCaseAlerts(GroupEnum group);
+        Task<GenericCommandResult> GetCaseAlerts(GroupEnum group);
 
-        GenericCommandResult GetGroupCaseAlert();
+        Task<GenericCommandResult> GetGroupCaseAlert();
     }
 }

@@ -48,13 +48,9 @@ public class CaseAlertHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
     }
 
-    public async Task CommunicateGroup(string group)
+    public async Task CommunicateGroup(CaseAlert caseAlert)
     {
-        var caseAlert = await _caseAlertRepository.GetCaseAlertByGroup((GroupEnum)Enum.Parse(typeof(GroupEnum), group));
-
-        var connections = await _connectionService.GetGroup(group);
-
-        await Clients.Groups(group).SendAsync("CommunicationReceived", caseAlert);
+        await Clients.Groups(caseAlert.Group.ToString()).SendAsync("CommunicationReceived", caseAlert);
     }
 
 

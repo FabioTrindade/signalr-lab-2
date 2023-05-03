@@ -38,19 +38,16 @@ namespace signalr_hub.Controllers
         }
 
         [HttpGet("case-alerts/{group}")]
-        public GenericCommandResult GetCaseAlerts([FromRoute] GroupEnum group)
-            => _caseAlertService.GetCaseAlerts(group);
+        public async Task<ActionResult<GenericCommandResult>> GetCaseAlerts([FromRoute] GroupEnum group)
+            => await _caseAlertService.GetCaseAlerts(group);
         
         [HttpPatch("case-alerts")]
-        public string Patch([FromBody] UpdateCaseAlertCommand command)
-        {
-            _caseAlertService.Update(command);
-            return "Case alert sent successfully to all users!";
-        }
+        public async Task<ActionResult<GenericCommandResult>> Patch([FromBody] UpdateCaseAlertCommand command)
+            => await _caseAlertService.Update(command);
 
         [HttpGet("group-alert")]
-        public GenericCommandResult GetGroupCaseAlert()
-            => _caseAlertService.GetGroupCaseAlert();
+        public async Task<ActionResult<GenericCommandResult>> GetGroupCaseAlert()
+            => await _caseAlertService.GetGroupCaseAlert();
         
     }
 }

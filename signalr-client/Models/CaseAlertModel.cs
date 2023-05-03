@@ -10,9 +10,9 @@
 
         public bool? IsActive { get; set; }
 
-        public DateTime? CreateAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
-        public DateTime? UpdateAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public string? Analyst { get; set; }
     }

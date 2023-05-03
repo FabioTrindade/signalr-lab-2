@@ -22,24 +22,28 @@ public class CaseAlertService : ICaseAlertService
 
     public async Task Create(CreateCaseAlertCommand command)
     {
-        await _caseAlertRepository.Create(new CaseAlert(command.Name, command.Description, command.Group));
+        var caseAlert = new CaseAlert(command.Name, command.Description, command.Group);
 
-        await NotificationGroup(command.Group);
+        await _caseAlertRepository.Create(caseAlert);
+
+        await NotificationGroup(caseAlert);
     }
 
-    public async void Update(UpdateCaseAlertCommand command)
+    public async Task<GenericCommandResult> Update(UpdateCaseAlertCommand command)
     {
-        var caseAlertUpdated = await _caseAlertRepository.GetByCaseAlertId(command.CaseAlertId);
-        
         await _caseAlertRepository.Update(command);
 
-        await NotificationGroup(caseAlertUpdated.Group);
+        var caseAlertUpdated = await _caseAlertRepository.GetByCaseAlertId(command.CaseAlertId);
+
+        await NotificationGroup(caseAlertUpdated);
+
+        return new(caseAlertUpdated);
     }
 
-    public GenericCommandResult GetCaseAlerts(GroupEnum group)
-        => new(_caseAlertRepository.GetCaseAlertByGroup(group));
+    public async Task<GenericCommandResult> GetCaseAlerts(GroupEnum group)
+        => new(await _caseAlertRepository.GetCaseAlertByGroup(group));
 
-    public GenericCommandResult GetGroupCaseAlert()
+    public async Task<GenericCommandResult> GetGroupCaseAlert()
         => new(GetEnumSelectList<GroupEnum>());
 
     public static IEnumerable<SelectListItem> GetEnumSelectList<T>()
@@ -51,10 +55,8 @@ public class CaseAlertService : ICaseAlertService
                                 Value = enu.ToString()
                             })).ToList();
 
-    private async Task NotificationGroup(GroupEnum group)
+    private async Task NotificationGroup(CaseAlert caseAlert)
     {
-        var result = await _caseAlertRepository.GetCaseAlertByGroup(group);
-
-        await _hubContext.Clients.Groups(group.ToString()).SendAsync("CommunicationReceived", result);
+        await _hubContext.Clients.Groups(caseAlert.Group.ToString()).SendAsync("CommunicationReceived", caseAlert);
     }
 }

@@ -16,11 +16,6 @@ function startConnection() {
     connection.start()
         .then(() => {
 
-            $('#btn-alert').on('click', function () {
-                let group = $('select[id="group-alert"]').val();
-                connection.invoke("CommunicateGroup", group);
-            })
-
             $('select[id="group-alert"]').on('change', function (e) {
                 let group = e.target.value;
                 let analyst = $('#analyst-name').val();
@@ -29,8 +24,8 @@ function startConnection() {
             })
 
             connection.on('CommunicationReceived', function (response) {
-                console.log(response);
-                $('#table-case-alert').bootstrapTable('load', response)
+                console.log('Chegou a comunicação ...')
+                updatedCaseAlert(response);
             })
 
             console.log('connected!')
@@ -41,4 +36,23 @@ function startConnection() {
 function reconnect() {
     console.log('reconnecting...');
     setTimeout(startConnection, 2000);
+}
+
+function updatedCaseAlert(response) {
+
+    const tableCaseAlert = $('#table-case-alert');
+
+    const tableData = tableCaseAlert.bootstrapTable('getData', false);
+
+    const objectIndex = tableData.findIndex((obj => obj.id == response.id))
+
+    if (objectIndex == -1) {
+        tableData.push(response)
+    }
+    else {
+        tableData[objectIndex].analyst = response.analyst;
+        tableData[objectIndex].updatedAt = response.updatedAt;
+    }
+
+    tableCaseAlert.bootstrapTable('load', response);
 }

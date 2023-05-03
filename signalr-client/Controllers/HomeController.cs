@@ -58,10 +58,10 @@ namespace signalr_client.Controllers
             return Json(_config.Value.BaseUrl);
         }
 
-        [HttpPatch("update-analyst-case-alert")]
-        public async Task<IActionResult> UpdateAnalystCaseAlert([FromBody] UpdateCaseAlertCommand command)
+        [HttpPatch("update-analyst-case-alert/{caseAlertId}")]
+        public async Task<IActionResult> UpdateAnalystCaseAlert([FromRoute] Guid caseAlertId, [FromQuery] bool? isActive, [FromQuery] string? analyst)
         {
-            var result = await _caseAlertService.PatchCaseAlertAsync(command);
+            var result = await _caseAlertService.PatchCaseAlertAsync(new UpdateCaseAlertCommand(caseAlertId, isActive, analyst));
             return Json(result);
         }
 

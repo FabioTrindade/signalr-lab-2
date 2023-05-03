@@ -1,9 +1,15 @@
 ﻿$(function () {
     CreateComboAjax('group-alert', '/get-group-alerts');
-    CreateTableCaseAlert();
+    createTableCaseAlert();
+
+    $('#btn-alert').on('click', function () {
+        let group = $('select[id="group-alert"]').val();
+        loadTableCaseAlert(group)
+    })
+
 })
 
-function CreateTableCaseAlert() {
+function createTableCaseAlert() {
     $('#table-case-alert').bootstrapTable({
         toolbar: '#toolbar',
         classe: 'table table-hover',
@@ -16,7 +22,7 @@ function CreateTableCaseAlert() {
 
                     let btnicon = !row.analyst ? 'fa-clock-rotate-left' : 'fa-user-clock';
                     let btnclass = !row.analyst ? 'btn-warning' : 'btn-success';
-                    let btnfunction = !row.analyst ? `onclick="StartInvestigation('${row.id}');` : '';
+                    let btnfunction = !row.analyst ? `onclick="startInvestigation('${row.id}');` : '';
                     let btndisabled = !row.analyst ? '' : 'disabled="true"';
 
                     return [
@@ -27,19 +33,20 @@ function CreateTableCaseAlert() {
                     ].join('');
                 }
             },
+            { field: 'id', title: 'Id', visible: false  },
             { field: 'name', title: 'Name' },
             { field: 'description', title: 'Description' },
             { field: 'isActive', title: 'IsActive', align: 'center', },
             {
-                field: 'createdAt', title: 'CreateAt', align: 'center',
+                field: 'createdAt', title: 'Created At', align: 'center',
                 formatter: function valueFormatter(value, row, index) {
-                    return (!value ? '-' : moment(row.createAt).format("DD/MM/YYYY HH:mm:ss"))
+                    return (!value ? '-' : moment(row.createdAt).format("DD/MM/YYYY HH:mm:ss"))
                 }
             },
             {
-                field: 'updatedAt', title: 'UpdateAt', align: 'center',
+                field: 'updatedAt', title: 'Updated At', align: 'center',
                 formatter: function valueFormatter(value, row, index) {
-                    return (!value ? '-' : moment(row.updateAt).format("DD/MM/YYYY HH:mm:ss"))
+                    return (!value ? '-' : moment(row.updatedAt).format("DD/MM/YYYY HH:mm:ss"))
                 }
             },
             { field: 'analyst', title: 'Analyst', align: 'center', },
@@ -47,14 +54,13 @@ function CreateTableCaseAlert() {
     })
 }
 
-function LoadTableCaseAlert(analyst, group) {
+function loadTableCaseAlert(group) {
     $('#table-case-alert').bootstrapTable('refreshOptions',{
-        url: `/get-case-alerts?analyst=${analyst}&group=${group}`
+        url: `/get-case-alerts?group=${group}`
     })
 }
 
-function StartInvestigation(id) {
-
+function startInvestigation(id) {
     let command = {
         analyst: $('#analyst-name').val()
     }
@@ -67,7 +73,7 @@ function StartInvestigation(id) {
 }
 
 function rowStyle(row, index) {
-    if (!!row.updateAt) {
+    if (!!row.updatedAt) {
         return { classes: 'bg-opacity-10 bg-success' }
     }
     return {

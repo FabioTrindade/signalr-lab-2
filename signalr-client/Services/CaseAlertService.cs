@@ -39,11 +39,10 @@ namespace signalr_client.Services
         {
             _logger.LogInformation($"Stating method {nameof(GetCaseAlertsAsync)}.");
 
-            if (command.Group is null || command.Analyst is null)
+            if (command.Group is null)
                 return new GenericCommandResult<List<CaseAlertModel>>(new List<CaseAlertModel>());
 
-            var content = HttpClientHelper.GetContent(command);
-            var response = await _httpClient.GetAsync(string.Format(_config.Value.CaseAlert, content));
+            var response = await _httpClient.GetAsync(string.Format(string.Format(_config.Value.CaseAlert, command.Group)));
             var result = await HttpClientHelper.DeserializeObjectResponse<List<CaseAlertModel>>(response);
 
             _logger.LogInformation($"Finish method {nameof(GetCaseAlertsAsync)}.");
@@ -56,7 +55,7 @@ namespace signalr_client.Services
             _logger.LogInformation($"Stating method {nameof(PatchCaseAlertAsync)}.");
 
             var content = HttpClientHelper.GetContent(command);
-            var response = await _httpClient.GetAsync(string.Format(_config.Value.UpdateCaseAlert, content));
+            var response = await _httpClient.PatchAsync(_config.Value.UpdateCaseAlert, content);
             var result = await HttpClientHelper.DeserializeObjectResponse<CaseAlertModel>(response);
 
             _logger.LogInformation($"Finish method {nameof(PatchCaseAlertAsync)}.");
