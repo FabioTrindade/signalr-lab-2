@@ -11,10 +11,10 @@ var redisSettings = builder.Configuration.GetSection(nameof(RedisSettings)).Get<
 //builder.Services.AddSignalR().AddStackExchangeRedis(redisSettings?.ConnectionString);
 
 builder.Services.AddSignalR(o => { o.EnableDetailedErrors = true; })
-    .AddStackExchangeRedis(redisSettings?.ConnectionString, options =>
-    {
-        options.Configuration.ChannelPrefix = "dsihub";
-    });
+   .AddStackExchangeRedis(redisSettings?.ConnectionString, options =>
+   {
+       options.Configuration.ChannelPrefix = "dsihub";
+   });
 
 builder.Services.AddCors(options =>
 {

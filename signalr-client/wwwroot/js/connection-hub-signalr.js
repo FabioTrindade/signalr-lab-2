@@ -1,6 +1,6 @@
 ﻿"use strict";
 
-const URL_BASE = 'http://localhost:5080/case-alerts-hub';
+const URL_BASE = 'http://localhost/case-alerts-hub';
 
 const connection = new signalR.HubConnectionBuilder()
     .withUrl(URL_BASE, {

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signalr-hub
+  labels:
+    app: signalr-hub
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: signalr-hub
+  template:
+    metadata:
+      labels:
+        app: signalr-hub
+    spec:
+      containers:
+      - name: signalr-hub
+        image: signalr-hub:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: signalr-connection
+  labels:
+    app: signalr-connection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signalr-connection
+  template:
+    metadata:
+      labels:
+        app: signalr-connection
+    spec:
+      containers:
+      - name: signalr-connection
+        image: redis:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: signalr-hub-service
+spec:
+ type: LoadBalancer
+ ports:
+ - port: 80
+ selector:
+   app: signalr-hub
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: signalr-connection-service
+spec:
+  selector:
+    app: signalr-connection
+  ports:
+  - protocol: TCP
+    port: 6379
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: signalr-hub-ingress
+  namespace: default
+spec:
+  rules:
+  - host: test-ingress.com
+    http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: signalr-hub-service
+            port:
+              number: 80
+        pathType: ImplementationSpecific

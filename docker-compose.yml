@@ -1,5 +1,14 @@
 version: '3.8'
 
+networks:
+  lab-network:
+    name: lab-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
+
 services:
   redis:
     container_name: signalr-connection
@@ -13,6 +22,7 @@ services:
         ipv4_address: 172.20.0.2
 
   signalr-hub:
+    container_name: signalr-hub
     image: ${DOCKER_REGISTRY-}signalr-hub
     depends_on:
       - redis
@@ -29,10 +39,4 @@ services:
       lab-network:
         ipv4_address: 172.20.0.4
   
-networks:
-  lab-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24
-          gateway: 172.20.0.1
+
