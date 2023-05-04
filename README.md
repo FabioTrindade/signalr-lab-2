@@ -17,3 +17,8 @@ docker compose build
 ...
 docker compose up -d
 ```
+
+## K8s
+```sh
+kubectl apply -f k8s/signalr.yaml
+```
