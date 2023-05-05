@@ -22,3 +22,5 @@ docker compose up -d
 ```sh
 kubectl apply -f k8s/signalr.yaml
 ```
+
+![signalr-lab-2](https://user-images.githubusercontent.com/30089341/236485684-7bee9898-e9b9-4a47-b5ba-73dd49f32224.png)
