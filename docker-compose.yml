@@ -11,7 +11,7 @@ networks:
 
 services:
   redis:
-    container_name: signalr-connection
+    container_name: signalr-redis
     image: redis:latest
     command: redis-server
     restart: always
@@ -21,11 +21,25 @@ services:
       lab-network:
         ipv4_address: 172.20.0.2
 
+  sqlserver:
+      container_name: signalr-sqlserver
+      image: mcr.microsoft.com/mssql/server:2019-latest
+      restart: always
+      ports:
+        - "1433:1433"
+      environment:
+          SA_PASSWORD: "S3cur3P@ssW0rd!"
+          ACCEPT_EULA: "Y"
+      networks:
+        lab-network:
+          ipv4_address: 172.20.0.3
+
   signalr-hub:
     container_name: signalr-hub
     image: ${DOCKER_REGISTRY-}signalr-hub
     depends_on:
       - redis
+      - sqlserver
     build:
       context: .
       dockerfile: signalr-hub/Dockerfile
@@ -35,8 +49,11 @@ services:
     environment:
       - "RedisSettings:Host=172.20.0.1"
       - "RedisSettings:Port=6379"
+      - "DatabaseSettings:Host=172.20.0.1"
+      - "DatabaseSettings:Port=1433"
+      - "DatabaseSettings:Database=buy4Risk"
+      - "DatabaseSettings:UserId=sa"
+      - "DatabaseSettings:Password=S3cur3P@ssW0rd!"
     networks:
       lab-network:
         ipv4_address: 172.20.0.4
-  
-

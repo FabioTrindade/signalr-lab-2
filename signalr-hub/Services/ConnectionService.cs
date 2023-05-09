@@ -21,8 +21,8 @@ public class ConnectionService : IConnectionService
     public async Task<IEnumerable<string>> GetGroup(string group)
         => await _connectionRepository.GetConnectionsByGroup(group);
 
-    public async Task<string> GetGroupByAnalyst(string analyst, string connectionId)
-        => await _connectionRepository.GetGroupByAnalyst(analyst, connectionId);
+    public async Task<string> GetGroupByAnalyst(string analyst)
+        => await _connectionRepository.GetGroupByAnalyst(analyst);
 
     public async Task Remove(Connection connection)
         => await _connectionRepository.Delete(connection);

@@ -5,7 +5,8 @@ const URL_BASE = 'http://localhost/case-alerts-hub';
 const connection = new signalR.HubConnectionBuilder()
     .withUrl(URL_BASE, {
         skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
+        transport: signalR.HttpTransportType.WebSockets,
+        withCredentials: false
     }).build();
 
 connection.onclose(reconnect);

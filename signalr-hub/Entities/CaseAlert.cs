@@ -4,6 +4,8 @@ namespace signalr_hub.Entities;
 
 public record CaseAlert : Entity
 {
+    public CaseAlert() { }
+
     public CaseAlert(string? name
         , string? description
         , GroupEnum group)

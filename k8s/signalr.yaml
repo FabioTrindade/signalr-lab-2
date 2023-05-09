@@ -33,25 +33,38 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: signalr-connection
+  name: signalr-redis
   labels:
-    app: signalr-connection
+    app: signalr-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: signalr-connection
+      app: signalr-redis
   template:
     metadata:
       labels:
-        app: signalr-connection
+        app: signalr-redis
     spec:
       containers:
-      - name: signalr-connection
+      - name: signalr-redis
         image: redis:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 6379
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: signalr-sql-server-service
+spec:
+  selector:
+    app: signalr-sql-server
+  ports:
+    - protocol: TCP
+      port: 1433
 
 ---
 
@@ -71,10 +84,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: signalr-connection-service
+  name: signalr-redis-service
 spec:
   selector:
-    app: signalr-connection
+    app: signalr-redis
   ports:
   - protocol: TCP
     port: 6379
@@ -88,7 +101,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: test-ingress.com
+  - host: signalr-ingress.com
     http:
       paths:
       - path: /
@@ -98,3 +111,50 @@ spec:
             port:
               number: 80
         pathType: ImplementationSpecific
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signalr-sql-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signalr-sql-server
+  minReadySeconds: 5
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: signalr-sql-server
+    spec:
+      containers:
+        - name: signalr-sql-server
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          ports:
+            - containerPort: 1433
+          env:
+            - name: "ACCEPT_EULA"
+              value: "Y"
+            - name: "SA_PASSWORD"
+              value: "S3cur3P@ssW0rd!"
+            - name: "MSSQL_PID"
+              value: "Express"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: signalr-sql-server-service
+spec:
+  selector:
+    app: signalr-sql-server
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+  type: ClusterIP

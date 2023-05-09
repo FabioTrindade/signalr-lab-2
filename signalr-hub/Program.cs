@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using signalr_hub.Configurations;
+using signalr_hub.Context;
 using signalr_hub.Hubs;
 using signalr_hub.Providers;
 using signalr_hub.Repositories;
@@ -6,15 +9,23 @@ using signalr_hub.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var machine = System.Environment.MachineName;
 var redisSettings = builder.Configuration.GetSection(nameof(RedisSettings)).Get<RedisSettings>();
+var databaseSettings = builder.Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
 
-//builder.Services.AddSignalR().AddStackExchangeRedis(redisSettings?.ConnectionString);
+builder.Services.AddDbContext<SignalRDataContext>(options =>
+{
+    options.UseSqlServer(databaseSettings?.ConnectionString,
+        migrations => migrations.MigrationsHistoryTable(string.Concat(databaseSettings.Database, "Migrations")));
+});
 
-builder.Services.AddSignalR(o => { o.EnableDetailedErrors = true; })
-   .AddStackExchangeRedis(redisSettings?.ConnectionString, options =>
-   {
-       options.Configuration.ChannelPrefix = "dsihub";
-   });
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+}).AddStackExchangeRedis(redisSettings?.ConnectionString, options =>
+{
+    options.Configuration.ChannelPrefix = "lab_2_hub";
+});
 
 builder.Services.AddCors(options =>
 {
@@ -41,9 +52,20 @@ builder.Services.AddScoped<IConnectionService, ConnectionService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = machine
+    });
+});
 
 var app = builder.Build();
+
+var scopeMigrations = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+scopeMigrations.ServiceProvider.GetRequiredService<SignalRDataContext>().Database.Migrate();
 
 app.UseWebSockets();
 

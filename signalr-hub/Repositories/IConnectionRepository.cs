@@ -12,6 +12,6 @@ namespace signalr_hub.Repositories
 
         Task<IEnumerable<string>> GetConnectionsByGroup(string group);
 
-        Task<string> GetGroupByAnalyst(string analyst, string connectionId);
+        Task<string> GetGroupByAnalyst(string analyst);
     }
 }

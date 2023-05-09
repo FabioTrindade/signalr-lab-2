@@ -20,28 +20,36 @@ public class CaseAlertService : ICaseAlertService
         _hubContext = hubContext;
     }
 
-    public async Task Create(CreateCaseAlertCommand command)
+    public async Task<GenericCommandResult> Create(CreateCaseAlertCommand command)
     {
         var caseAlert = new CaseAlert(command.Name, command.Description, command.Group);
 
-        await _caseAlertRepository.Create(caseAlert);
+        var result = await _caseAlertRepository.CreateAsync(caseAlert);
 
-        await NotificationGroup(caseAlert);
+        await NotificationGroup(result);
+
+        return new(result);
     }
 
     public async Task<GenericCommandResult> Update(UpdateCaseAlertCommand command)
     {
-        await _caseAlertRepository.Update(command);
+        var caseAlert = await _caseAlertRepository.GetFirstByIdAsync(command.CaseAlertId);
 
-        var caseAlertUpdated = await _caseAlertRepository.GetByCaseAlertId(command.CaseAlertId);
+        if(command.IsActive is not null)
+            caseAlert.SetActive(command.IsActive.Value);
+        
+        caseAlert.SetAnalyst(command?.Analyst);
+        caseAlert.SetUpdatedAt();
 
-        await NotificationGroup(caseAlertUpdated);
+        var result = await _caseAlertRepository.UpdateAsync(caseAlert);
 
-        return new(caseAlertUpdated);
+        await NotificationGroup(result);
+
+        return new(result);
     }
 
     public async Task<GenericCommandResult> GetCaseAlerts(GroupEnum group)
-        => new(await _caseAlertRepository.GetCaseAlertByGroup(group));
+        => new(await _caseAlertRepository.GetAllAsync(w => w.Group == group));
 
     public async Task<GenericCommandResult> GetGroupCaseAlert()
         => new(GetEnumSelectList<GroupEnum>());
@@ -57,6 +65,6 @@ public class CaseAlertService : ICaseAlertService
 
     private async Task NotificationGroup(CaseAlert caseAlert)
     {
-        await _hubContext.Clients.Groups(caseAlert.Group.ToString()).SendAsync("CommunicationReceived", caseAlert);
+        await _hubContext.Clients.Group(caseAlert.Group.ToString()).SendAsync("CommunicationReceived", caseAlert);
     }
 }

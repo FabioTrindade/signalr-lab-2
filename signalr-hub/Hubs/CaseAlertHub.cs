@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using signalr_hub.Entities;
-using signalr_hub.Enums;
 using signalr_hub.Repositories;
 using signalr_hub.Services;
-
 namespace signalr_hub.Hubs;
 
 public class CaseAlertHub : Hub
@@ -48,18 +46,12 @@ public class CaseAlertHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
     }
 
-    public async Task CommunicateGroup(CaseAlert caseAlert)
-    {
-        await Clients.Groups(caseAlert.Group.ToString()).SendAsync("CommunicationReceived", caseAlert);
-    }
-
-
     private async Task ValidateAlreadyInformedGroup(string analyst, string group, string connectionId)
     {
-        var groupActual = await _connectionService.GetGroupByAnalyst(analyst, connectionId);
+        var groupActual = await _connectionService.GetGroupByAnalyst(analyst);
 
         if (groupActual is not null && groupActual != group)
-            await Groups.RemoveFromGroupAsync(connectionId, group);
+           await Groups.RemoveFromGroupAsync(connectionId, groupActual);
     }
 
     private async Task RemoveAnalystFromRoom(string analyst, string group)
@@ -88,7 +80,6 @@ public class CaseAlertHub : Hub
             {
                 await Groups.RemoveFromGroupAsync(connection, group);
             });
-
         }
     }
 }

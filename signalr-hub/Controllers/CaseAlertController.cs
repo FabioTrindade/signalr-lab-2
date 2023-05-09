@@ -16,26 +16,25 @@ namespace signalr_hub.Controllers
         }
 
         [HttpPost("case-alerts-generate")]
-        public string PostCaseAlertGenerate([FromBody] int numberCaseAlert)
+        public async Task<ActionResult<GenericCommandResult>> PostCaseAlertGenerate([FromBody] int numberCaseAlert)
         {
+            var total = Enum.GetNames(typeof(GroupEnum)).Length;
+
             for (int i = 0; i < numberCaseAlert; i++)
             {
-                var mod = i % 4;
+                var mod = i % total;
 
-                _caseAlertService.Create(new CreateCaseAlertCommand($"Alert {((GroupEnum)mod).ToString()} {i}", $"Description {((GroupEnum)mod).ToString()} {i}", (GroupEnum)mod));
+                _caseAlertService.Create(new CreateCaseAlertCommand($"Alert {(GroupEnum)mod} {i}", $"Description {(GroupEnum)mod} {i}", (GroupEnum)mod));
 
                 Thread.Sleep(1000);
             }
 
-            return "Case alert sent successfully to all users!";
+            return new GenericCommandResult("Case alert sent successfully to all users!");
         }
 
         [HttpPost("case-alerts")]
-        public string PostCaseAlert([FromBody] CreateCaseAlertCommand command)
-        {
-            _caseAlertService.Create(command);
-            return "Case alert sent successfully to all users!";
-        }
+        public async Task<ActionResult<GenericCommandResult>> PostCaseAlert([FromBody] CreateCaseAlertCommand command)
+            => await _caseAlertService.Create(command);
 
         [HttpGet("case-alerts/{group}")]
         public async Task<ActionResult<GenericCommandResult>> GetCaseAlerts([FromRoute] GroupEnum group)

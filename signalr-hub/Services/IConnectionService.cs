@@ -13,6 +13,6 @@ namespace signalr_hub.Services
 
         Task<IEnumerable<string>> GetGroup(string group);
 
-        Task<string> GetGroupByAnalyst(string analyst, string connectionId);
+        Task<string> GetGroupByAnalyst(string analyst);
     }
 }

@@ -1,16 +1,15 @@
 ﻿using signalr_hub.Commands;
 using signalr_hub.Enums;
 
-namespace signalr_hub.Services
+namespace signalr_hub.Services;
+
+public interface ICaseAlertService
 {
-    public interface ICaseAlertService
-    {
-        Task Create(CreateCaseAlertCommand command);
+    Task<GenericCommandResult> Create(CreateCaseAlertCommand command);
 
-        Task<GenericCommandResult> Update(UpdateCaseAlertCommand command);
+    Task<GenericCommandResult> Update(UpdateCaseAlertCommand command);
 
-        Task<GenericCommandResult> GetCaseAlerts(GroupEnum group);
+    Task<GenericCommandResult> GetCaseAlerts(GroupEnum group);
 
-        Task<GenericCommandResult> GetGroupCaseAlert();
-    }
+    Task<GenericCommandResult> GetGroupCaseAlert();
 }
