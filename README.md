@@ -1,5 +1,7 @@
 # signalr-lab-2
-Novo lab do signalr com controle de grupo
+Novo lab do signalr com controle de grupo, utilizando redis
+
+![signalr-lab-2](https://github.com/FabioTrindade/signalr-lab-2/assets/30089341/0cfdd0a0-9410-429e-b948-7124b320a0c6)
 
 ## Database
 ### Redis
@@ -21,5 +23,3 @@ docker compose up -d
 ```sh
 kubectl apply -f k8s/signalr.yaml
 ```
-
-![signalr-lab-2](https://user-images.githubusercontent.com/30089341/236485684-7bee9898-e9b9-4a47-b5ba-73dd49f32224.png)
